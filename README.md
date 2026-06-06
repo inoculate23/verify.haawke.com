@@ -1,6 +1,6 @@
 # Haawke Verify
 
-![Haawke Verify](https://verify.haawke.com/og.jpg)
+![Haawke Verify](https://verify.haawke.com/background.jpg)
 
 **Public provenance registry for cryptographically certified human-AI collaborative works.**
 
