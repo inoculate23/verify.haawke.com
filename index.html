@@ -8,14 +8,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #06090f;
-    --surface: rgba(13,22,42,0.92);
-    --border: rgba(80,160,255,0.2);
+    --bg: #080e1a;
+    --surface: #0d1e38;
+    --border: rgba(80,160,255,0.35);
     --gold: #c9a84c;
     --blue: #4fa8e8;
-    --blue-dim: rgba(79,168,232,0.15);
+    --blue-dim: rgba(79,168,232,0.2);
     --cream: #f0ead8;
-    --dim: rgba(240,234,216,0.85);
+    --dim: rgba(240,234,216,0.75);
     --verified: #4caf7d;
     --notfound: #e87b4f;
   }
@@ -79,8 +79,8 @@
   }
 
   .eyebrow {
-    font-size: 15px;
-    letter-spacing: 0.3em;
+    font-size: 13px;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
     color: var(--gold);
     margin-bottom: 20px;
@@ -91,7 +91,7 @@
   h1 {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 300;
-    font-size: 16px;
+    font-size: clamp(42px, 7vw, 72px);
     line-height: 1;
     letter-spacing: -0.01em;
     color: var(--cream);
@@ -106,8 +106,8 @@
   }
 
   .tagline {
-    font-size: 16px;
-    letter-spacing: 0.1em;
+    font-size: 15px;
+    letter-spacing: 0.08em;
     color: var(--dim);
     line-height: 1.8;
     opacity: 0;
@@ -122,7 +122,7 @@
   }
 
   .search-label {
-    font-size: 15px;
+    font-size: 13px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--gold);
@@ -148,13 +148,13 @@
     border: none;
     color: var(--cream);
     font-family: 'Courier Prime', monospace;
-    font-size: 17px;
+    font-size: 15px;
     padding: 16px 20px;
     outline: none;
     letter-spacing: 0.06em;
   }
 
-  .search-input::placeholder { color: rgba(240,234,216,0.6); }
+  .search-input::placeholder { color: rgba(240,234,216,0.35); }
 
   .search-btn {
     background: transparent;
@@ -162,8 +162,8 @@
     border-left: 1px solid var(--border);
     color: var(--blue);
     font-family: 'Courier Prime', monospace;
-    font-size: 15px;
-    letter-spacing: 0.2em;
+    font-size: 13px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     padding: 16px 28px;
     cursor: pointer;
@@ -177,8 +177,8 @@
   }
 
   .search-hint {
-    font-size: 15px;
-    color: rgba(240,234,216,0.75);
+    font-size: 13px;
+    color: rgba(240,234,216,0.5);
     margin-top: 10px;
     letter-spacing: 0.06em;
   }
@@ -229,8 +229,8 @@
   .not-found .status-dot { background: var(--notfound); box-shadow: 0 0 12px var(--notfound); }
 
   .status-text {
-    font-size: 16px;
-    letter-spacing: 0.18em;
+    font-size: 14px;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
   }
 
@@ -250,34 +250,34 @@
   }
 
   .record-label {
-    font-size: 14px;
-    letter-spacing: 0.2em;
+    font-size: 12px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--gold);
     padding-top: 2px;
   }
 
   .record-value {
-    font-size: 17px;
+    font-size: 15px;
     color: var(--cream);
     line-height: 1.6;
     word-break: break-all;
   }
 
   .record-value.hash {
-    font-size: 15px;
+    font-size: 13px;
     color: var(--blue);
     letter-spacing: 0.04em;
   }
 
-  .record-value.dim { color: var(--dim); font-size: 16px; }
+  .record-value.dim { color: var(--dim); font-size: 14px; }
 
   .ots-note {
     margin-top: 24px;
     padding: 16px 20px;
-    border: 1px solid rgba(201,168,76,0.2);
-    background: rgba(201,168,76,0.04);
-    font-size: 15px;
+    border: 1px solid rgba(201,168,76,0.25);
+    background: rgba(201,168,76,0.06);
+    font-size: 13px;
     color: var(--dim);
     line-height: 1.8;
     letter-spacing: 0.06em;
@@ -300,14 +300,14 @@
   }
 
   .section-label {
-    font-size: 15px;
+    font-size: 13px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--gold);
   }
 
   .section-count {
-    font-size: 15px;
+    font-size: 13px;
     color: var(--dim);
     letter-spacing: 0.1em;
   }
@@ -332,7 +332,7 @@
   }
 
   .recent-filename {
-    font-size: 17px;
+    font-size: 15px;
     color: var(--cream);
     margin-bottom: 3px;
     white-space: nowrap;
@@ -341,22 +341,22 @@
   }
 
   .recent-hash {
-    font-size: 14px;
+    font-size: 12px;
     color: var(--blue);
     letter-spacing: 0.04em;
-    opacity: 1;
+    opacity: 0.8;
   }
 
   .recent-time {
-    font-size: 15px;
+    font-size: 13px;
     color: var(--dim);
     white-space: nowrap;
     text-align: right;
   }
 
   .recent-author {
-    font-size: 14px;
-    color: rgba(201,168,76,0.6);
+    font-size: 12px;
+    color: rgba(201,168,76,0.75);
     text-align: right;
     margin-top: 2px;
   }
@@ -364,8 +364,8 @@
   .empty-state {
     text-align: center;
     padding: 48px 24px;
-    border: 1px dashed rgba(79,168,232,0.15);
-    font-size: 16px;
+    border: 1px dashed rgba(79,168,232,0.2);
+    font-size: 14px;
     color: var(--dim);
     letter-spacing: 0.08em;
   }
@@ -374,15 +374,15 @@
   footer {
     margin-top: 80px;
     padding-top: 28px;
-    border-top: 1px solid rgba(79,168,232,0.1);
+    border-top: 1px solid rgba(79,168,232,0.15);
     text-align: center;
-    font-size: 15px;
-    color: rgba(240,234,216,0.75);
-    letter-spacing: 0.1em;
+    font-size: 13px;
+    color: rgba(240,234,216,0.5);
+    letter-spacing: 0.08em;
     line-height: 2.2;
   }
 
-  footer a { color: rgba(201,168,76,0.5); text-decoration: none; }
+  footer a { color: rgba(201,168,76,0.65); text-decoration: none; }
   footer a:hover { color: var(--gold); }
 
   .pulse {
@@ -407,8 +407,8 @@
 
   @media (max-width: 600px) {
     .record-row { grid-template-columns: 1fr; gap: 4px; }
-    .record-label { font-size: 14px; }
-    .search-btn { padding: 16px 18px; font-size: 14px; }
+    .record-label { font-size: 11px; }
+    .search-btn { padding: 16px 18px; font-size: 12px; }
     .result-card { padding: 24px 20px; }
   }
 </style>
@@ -444,7 +444,7 @@
           autocomplete="off"
           spellcheck="false"
         >
-        <button class="search-btn" onclick="verifyHash()">Verify</button>
+        <button class="search-btn" id="verifyBtn">Verify</button>
       </div>
       <div class="search-hint">Paste any SHA-256 hash to check if it exists in the public provenance registry</div>
     </div>
@@ -493,13 +493,10 @@
   </div>
 </div>
 
-<script>
+<script type="module">
   const API = 'https://haawke-verify.haawkeai.workers.dev';
 
-  // Load recent on page load
-  loadRecent();
-
-  // Enter key triggers verify
+  document.getElementById('verifyBtn').addEventListener('click', () => verifyHash());
   document.getElementById('hashInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') verifyHash();
   });
@@ -512,20 +509,19 @@
       return;
     }
 
-    const btn = document.querySelector('.search-btn');
+    const btn = document.getElementById('verifyBtn');
     btn.textContent = 'Checking...';
     btn.disabled = true;
 
     try {
       const res = await fetch(`${API}/verify/${hash}`);
       const data = await res.json();
-
       if (data.status === 'verified') {
         showVerified(data);
       } else {
         showNotFound(hash);
       }
-    } catch(e) {
+    } catch {
       showError('Could not reach registry. Please try again.');
     }
 
@@ -596,10 +592,10 @@
   }
 
   async function loadRecent() {
+    const list = document.getElementById('recentList');
     try {
       const res = await fetch(`${API}/recent`);
       const data = await res.json();
-      const list = document.getElementById('recentList');
       const count = document.getElementById('recentCount');
 
       if (!data.records || data.records.length === 0) {
@@ -607,12 +603,12 @@
         return;
       }
 
-      count.textContent = `${data.records.length} record${data.records.length !== 1 ? 's' : ''}`;
+      count.textContent = `${data.records.length} record${data.records.length === 1 ? '' : 's'}`;
 
       list.innerHTML = data.records.map(r => {
         const ts = r.registered ? new Date(r.registered).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
         return `
-          <div class="recent-item" onclick="document.getElementById('hashInput').value='${r.hash}'; verifyHash();">
+          <div class="recent-item" data-hash="${r.hash}">
             <div>
               <div class="recent-filename">${r.filename || 'unnamed'}</div>
               <div class="recent-hash">${r.hash}</div>
@@ -625,11 +621,124 @@
         `;
       }).join('');
 
-    } catch(e) {
-      document.getElementById('recentList').innerHTML = '<div class="empty-state">Could not load registry.</div>';
+      list.addEventListener('click', e => {
+        const item = e.target.closest('.recent-item');
+        if (item) {
+          document.getElementById('hashInput').value = item.dataset.hash;
+          verifyHash();
+        }
+      });
+
+    } catch {
+      list.innerHTML = '<div class="empty-state">Could not load registry.</div>';
+    }
+  }
+
+  await loadRecent();
+</script>
+
+<!-- HAAWKE PROVENANCE BADGE -->
+<div id="haawke-badge"
+     data-date="June 5, 2026"
+     data-author="Craig Ellenwood × Claude (Anthropic)">
+</div>
+
+<style>
+  #haawke-badge {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    font-family: 'Courier New', monospace;
+  }
+  .hb-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(12px);
+    border: 1px solid;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .hb-pill.checking { background: rgba(20,40,80,0.98); border-color: #4fa8e8; color: #ffffff; box-shadow: 0 0 24px rgba(79,168,232,0.6); }
+  .hb-pill.verified { background: rgba(30,20,5,0.98); border-color: #c9a84c; color: #ffffff; box-shadow: 0 0 28px rgba(201,168,76,0.7), 0 0 60px rgba(201,168,76,0.3); }
+  .hb-pill.tampered { background: rgba(60,5,5,0.98); border-color: #ff5050; color: #ffffff; box-shadow: 0 0 28px rgba(255,80,80,0.8), 0 0 60px rgba(255,80,80,0.4); }
+  .hb-pill.unset { background: rgba(20,40,80,0.98); border-color: #4fa8e8; color: #ffffff; box-shadow: 0 0 20px rgba(79,168,232,0.5); }
+  .hb-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .hb-pill.checking .hb-dot { background: #fff; box-shadow: 0 0 10px #4fa8e8; animation: hb-pulse 1s ease-in-out infinite; }
+  .hb-pill.verified .hb-dot { background: #fff; box-shadow: 0 0 10px #c9a84c, 0 0 20px #c9a84c; }
+  .hb-pill.tampered .hb-dot { background: #fff; box-shadow: 0 0 10px #ff5050, 0 0 20px #ff5050; animation: hb-pulse 0.5s ease-in-out infinite; }
+  .hb-pill.unset .hb-dot { background: rgba(79,168,232,0.4); }
+  @keyframes hb-pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .hb-panel { display: none; position: absolute; bottom: calc(100% + 10px); right: 0; width: 320px; background: rgba(8,14,26,0.97); border: 1px solid rgba(201,168,76,0.3); padding: 18px 20px; font-size: 11px; line-height: 1.8; letter-spacing: 0.06em; }
+  .hb-panel.open { display: block; }
+  .hb-panel-title { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: #c9a84c; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(201,168,76,0.2); }
+  .hb-panel-row { display: flex; gap: 8px; margin-bottom: 6px; }
+  .hb-panel-label { color: rgba(240,234,216,0.5); flex-shrink: 0; width: 70px; }
+  .hb-panel-value { color: rgba(240,234,216,0.9); word-break: break-all; }
+  .hb-panel-value.hash { color: rgba(79,168,232,0.9); font-size: 10px; }
+  .hb-panel-value.match { color: #c9a84c; }
+  .hb-panel-value.mismatch { color: #ff5050; }
+  .hb-panel-link { display: block; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(201,168,76,0.15); color: rgba(79,168,232,0.7); text-decoration: none; font-size: 10px; letter-spacing: 0.1em; text-align: center; }
+  .hb-panel-link:hover { color: rgba(79,168,232,1); }
+</style>
+
+<script type="module">
+  const badge = document.getElementById('haawke-badge');
+  if (badge) {
+    const date = badge.dataset.date || '';
+    const author = badge.dataset.author || 'Craig Ellenwood × Claude (Anthropic)';
+
+    let storedHash = null;
+    try {
+      const resp = await fetch('./provenance.json');
+      const data = await resp.json();
+      storedHash = data.hash;
+      if (data.date) badge.dataset.date = data.date;
+    } catch {
+      // provenance.json not found — badge will show unset
+    }
+
+    const pill = document.createElement('div');
+    pill.className = 'hb-pill checking';
+    pill.innerHTML = '<div class="hb-dot"></div><span class="hb-text">Verifying...</span>';
+    const panel = document.createElement('div');
+    panel.className = 'hb-panel';
+    badge.appendChild(panel);
+    badge.appendChild(pill);
+    pill.addEventListener('click', () => panel.classList.toggle('open'));
+    document.addEventListener('click', (ev) => { if (!badge.contains(ev.target)) panel.classList.remove('open'); });
+
+    if (!storedHash || storedHash === 'PASTE_YOUR_SHA256_HERE') {
+      pill.className = 'hb-pill unset';
+      pill.querySelector('.hb-text').textContent = 'Provenance · Unconfigured';
+      panel.innerHTML = `<div class="hb-panel-title">Haawke Provenance</div><div class="hb-panel-row"><div class="hb-panel-label">Status</div><div class="hb-panel-value mismatch">Hash not configured</div></div><div class="hb-panel-row"><div class="hb-panel-label">Author</div><div class="hb-panel-value">${author}</div></div><a class="hb-panel-link" href="https://hash.haawke.com" target="_blank">hash.haawke.com →</a>`;
+    } else {
+      try {
+        const fileResp = await fetch(`./index.html?nocache=${Date.now()}`);
+        const fileText = await fileResp.text();
+        const encoded = new TextEncoder().encode(fileText);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', encoded);
+        const liveHash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join('');
+        const matches = liveHash.toLowerCase() === storedHash.toLowerCase();
+        pill.className = `hb-pill ${matches ? 'verified' : 'tampered'}`;
+        pill.querySelector('.hb-text').textContent = matches ? '✓ Verified' : '⚠ Hash Mismatch';
+        panel.innerHTML = `<div class="hb-panel-title">Haawke Provenance</div><div class="hb-panel-row"><div class="hb-panel-label">Status</div><div class="hb-panel-value ${matches?'match':'mismatch'}">${matches?'✓ Verified — content unchanged':'⚠ Content has changed since certification'}</div></div><div class="hb-panel-row"><div class="hb-panel-label">Author</div><div class="hb-panel-value">${author}</div></div><div class="hb-panel-row"><div class="hb-panel-label">Certified</div><div class="hb-panel-value">${date}</div></div><div class="hb-panel-row"><div class="hb-panel-label">Stored</div><div class="hb-panel-value hash">${storedHash.slice(0,32)}...</div></div><div class="hb-panel-row"><div class="hb-panel-label">Live</div><div class="hb-panel-value hash">${liveHash.slice(0,32)}...</div></div><div class="hb-panel-row"><div class="hb-panel-label">ORCID</div><div class="hb-panel-value">0009-0001-6475-5109</div></div><a class="hb-panel-link" href="https://hash.haawke.com" target="_blank">Haawke Hash · Provenance Tool →</a>`;
+      } catch {
+        pill.className = 'hb-pill unset';
+        pill.querySelector('.hb-text').textContent = 'Verification error';
+      }
     }
   }
 </script>
+<!-- END HAAWKE BADGE -->
 
 </body>
 </html>
