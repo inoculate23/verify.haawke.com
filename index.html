@@ -633,6 +633,14 @@
   }
 
   await loadRecent();
+
+  // Auto-verify from URL fragment — enables QR code deep-linking
+  // e.g. verify.haawke.com/#1b932bc1abe3471b...
+  const fragment = location.hash.slice(1).trim().toLowerCase();
+  if (/^[0-9a-f]{64}$/.test(fragment)) {
+    document.getElementById('hashInput').value = fragment;
+    await verifyHash();
+  }
 </script>
 
 <!-- HAAWKE PROVENANCE BADGE -->
