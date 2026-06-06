@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haawke Verify — Provenance Registry</title>
+<meta name="description" content="Verify the cryptographic provenance of any work registered in the Haawke Neural Technology public registry.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06090f;
+    --surface: rgba(13,22,42,0.92);
+    --border: rgba(80,160,255,0.2);
+    --gold: #c9a84c;
+    --blue: #4fa8e8;
+    --blue-dim: rgba(79,168,232,0.15);
+    --cream: #f0ead8;
+    --dim: rgba(240,234,216,0.55);
+    --verified: #4caf7d;
+    --notfound: #e87b4f;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    min-height: 100vh;
+    font-family: 'Courier Prime', monospace;
+    color: var(--cream);
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  .bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .bg-layer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(79,168,232,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(201,168,76,0.04) 0%, transparent 50%);
+  }
+
+  .bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(79,168,232,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,168,232,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* LAYOUT */
+  .page {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 80px 24px 100px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 760px;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.1s;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(42px, 7vw, 72px);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--cream);
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.2s;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--blue);
+  }
+
+  .tagline {
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--dim);
+    line-height: 1.8;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.3s;
+  }
+
+  /* SEARCH */
+  .search-section {
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.4s;
+  }
+
+  .search-label {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .search-row {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s;
+  }
+
+  .search-row:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 30px rgba(79,168,232,0.1);
+  }
+
+  .search-input {
+    flex: 1;
+    background: var(--surface);
+    border: none;
+    color: var(--cream);
+    font-family: 'Courier Prime', monospace;
+    font-size: 14px;
+    padding: 16px 20px;
+    outline: none;
+    letter-spacing: 0.06em;
+  }
+
+  .search-input::placeholder { color: rgba(240,234,216,0.25); }
+
+  .search-btn {
+    background: transparent;
+    border: none;
+    border-left: 1px solid var(--border);
+    color: var(--blue);
+    font-family: 'Courier Prime', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 16px 28px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .search-btn:hover {
+    background: var(--blue-dim);
+    color: var(--cream);
+  }
+
+  .search-hint {
+    font-size: 11px;
+    color: rgba(240,234,216,0.3);
+    margin-top: 10px;
+    letter-spacing: 0.06em;
+  }
+
+  /* RESULT */
+  .result {
+    display: none;
+    margin-bottom: 48px;
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .result.visible { display: block; }
+
+  .result-card {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 32px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .result-card.verified::before { background: linear-gradient(90deg, transparent, var(--verified), transparent); }
+  .result-card.not-found::before { background: linear-gradient(90deg, transparent, var(--notfound), transparent); }
+
+  .result-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .status-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .verified .status-dot { background: var(--verified); box-shadow: 0 0 12px var(--verified); }
+  .not-found .status-dot { background: var(--notfound); box-shadow: 0 0 12px var(--notfound); }
+
+  .status-text {
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .verified .status-text { color: var(--verified); }
+  .not-found .status-text { color: var(--notfound); }
+
+  .record-grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .record-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 16px;
+    align-items: baseline;
+  }
+
+  .record-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding-top: 2px;
+  }
+
+  .record-value {
+    font-size: 14px;
+    color: var(--cream);
+    line-height: 1.6;
+    word-break: break-all;
+  }
+
+  .record-value.hash {
+    font-size: 12px;
+    color: var(--blue);
+    letter-spacing: 0.04em;
+  }
+
+  .record-value.dim { color: var(--dim); font-size: 13px; }
+
+  .ots-note {
+    margin-top: 24px;
+    padding: 16px 20px;
+    border: 1px solid rgba(201,168,76,0.2);
+    background: rgba(201,168,76,0.04);
+    font-size: 12px;
+    color: var(--dim);
+    line-height: 1.8;
+    letter-spacing: 0.06em;
+  }
+
+  .ots-note a { color: var(--gold); text-decoration: none; }
+  .ots-note a:hover { color: var(--cream); }
+
+  /* RECENT */
+  .recent-section {
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.5s;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .section-count {
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+  }
+
+  .recent-list { display: flex; flex-direction: column; gap: 2px; }
+
+  .recent-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 20px;
+    background: rgba(13,22,42,0.6);
+    border: 1px solid rgba(79,168,232,0.08);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .recent-item:hover {
+    border-color: var(--border);
+    background: var(--surface);
+  }
+
+  .recent-filename {
+    font-size: 14px;
+    color: var(--cream);
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .recent-hash {
+    font-size: 10px;
+    color: var(--blue);
+    letter-spacing: 0.04em;
+    opacity: 0.7;
+  }
+
+  .recent-time {
+    font-size: 11px;
+    color: var(--dim);
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .recent-author {
+    font-size: 10px;
+    color: rgba(201,168,76,0.6);
+    text-align: right;
+    margin-top: 2px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    border: 1px dashed rgba(79,168,232,0.15);
+    font-size: 13px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+  }
+
+  /* FOOTER */
+  footer {
+    margin-top: 80px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(79,168,232,0.1);
+    text-align: center;
+    font-size: 11px;
+    color: rgba(240,234,216,0.3);
+    letter-spacing: 0.1em;
+    line-height: 2.2;
+  }
+
+  footer a { color: rgba(201,168,76,0.5); text-decoration: none; }
+  footer a:hover { color: var(--gold); }
+
+  .pulse {
+    display: inline-block;
+    width: 5px; height: 5px;
+    background: var(--blue);
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 2s ease-in-out infinite;
+    vertical-align: middle;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; box-shadow: 0 0 6px var(--blue); }
+    50% { opacity: 0.3; box-shadow: none; }
+  }
+
+  @media (max-width: 600px) {
+    .record-row { grid-template-columns: 1fr; gap: 4px; }
+    .record-label { font-size: 9px; }
+    .search-btn { padding: 16px 18px; font-size: 10px; }
+    .result-card { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer">
+  <div class="bg-grid"></div>
+</div>
+
+<div class="page">
+  <div class="container">
+
+    <header>
+      <div class="eyebrow">Haawke Neural Technology · Public Registry</div>
+      <h1>Haawke <em>Verify</em></h1>
+      <div class="tagline">
+        Cryptographic provenance for human-AI collaborative works<br>
+        Craig Ellenwood × Claude (Anthropic) · ORCID 0009-0001-6475-5109
+      </div>
+    </header>
+
+    <!-- SEARCH -->
+    <div class="search-section">
+      <label class="search-label" for="hashInput">Enter SHA-256 Hash</label>
+      <div class="search-row">
+        <input
+          type="text"
+          id="hashInput"
+          class="search-input"
+          placeholder="e.g. 1b932bc1abe3471bf3a46dc7d8d060e212915b2be99013d02927b42e9b4d9211"
+          maxlength="64"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <button class="search-btn" onclick="verifyHash()">Verify</button>
+      </div>
+      <div class="search-hint">Paste any SHA-256 hash to check if it exists in the public provenance registry</div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="result" id="result">
+      <div class="result-card" id="resultCard">
+        <div class="result-status">
+          <div class="status-dot"></div>
+          <div class="status-text" id="statusText"></div>
+        </div>
+        <div class="record-grid" id="recordGrid"></div>
+        <div class="ots-note" id="otsNote" style="display:none">
+          <strong style="color:var(--gold)">Blockchain Verification</strong><br>
+          This hash was submitted to the Bitcoin blockchain via OpenTimestamps.
+          To verify the timestamp, download the <code>.ots</code> proof file for this work
+          and upload it alongside the original file at
+          <a href="https://opentimestamps.org/verify" target="_blank">opentimestamps.org/verify</a>.
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT -->
+    <div class="recent-section">
+      <div class="section-header">
+        <div class="section-label">Recent Registrations</div>
+        <div class="section-count" id="recentCount"></div>
+      </div>
+      <div class="recent-list" id="recentList">
+        <div class="empty-state">Loading registry...</div>
+      </div>
+    </div>
+
+    <footer>
+      <span class="pulse"></span>
+      Haawke Verify · Public Provenance Registry · All records are permanent and immutable<br>
+      First-write-wins · No record can be modified after registration<br>
+      Blockchain timestamps verified via <a href="https://opentimestamps.org" target="_blank">OpenTimestamps</a> · Bitcoin<br><br>
+      <a href="https://hash.haawke.com" target="_blank">hash.haawke.com</a> &nbsp;·&nbsp;
+      <a href="https://haawke.com" target="_blank">haawke.com</a> &nbsp;·&nbsp;
+      ORCID <a href="https://orcid.org/0009-0001-6475-5109" target="_blank">0009-0001-6475-5109</a><br>
+      Craig Ellenwood × Claude (Anthropic) · Haawke Neural Technology · 2026<br><br>
+      Cite as: Ellenwood, C. &amp; Claude (Anthropic). (2026). Haawke Verify: Public Provenance Registry. Haawke Neural Technology. https://verify.haawke.com
+    </footer>
+
+  </div>
+</div>
+
+<script>
+  const API = 'https://haawke-verify.haawkeai.workers.dev';
+
+  // Load recent on page load
+  loadRecent();
+
+  // Enter key triggers verify
+  document.getElementById('hashInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') verifyHash();
+  });
+
+  async function verifyHash() {
+    const hash = document.getElementById('hashInput').value.trim().toLowerCase();
+    if (!hash) return;
+    if (hash.length !== 64 || !/^[0-9a-f]+$/.test(hash)) {
+      showError('Invalid hash format. SHA-256 hashes are 64 hexadecimal characters.');
+      return;
+    }
+
+    const btn = document.querySelector('.search-btn');
+    btn.textContent = 'Checking...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(`${API}/verify/${hash}`);
+      const data = await res.json();
+
+      if (data.status === 'verified') {
+        showVerified(data);
+      } else {
+        showNotFound(hash);
+      }
+    } catch(e) {
+      showError('Could not reach registry. Please try again.');
+    }
+
+    btn.textContent = 'Verify';
+    btn.disabled = false;
+  }
+
+  function showVerified(data) {
+    const card = document.getElementById('resultCard');
+    card.className = 'result-card verified';
+    document.getElementById('statusText').textContent = '✓ Verified — Found in Registry';
+
+    const ts = data.registered ? new Date(data.registered).toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' }) : '—';
+
+    document.getElementById('recordGrid').innerHTML = `
+      <div class="record-row">
+        <div class="record-label">Hash</div>
+        <div class="record-value hash">${data.hash}</div>
+      </div>
+      <div class="record-row">
+        <div class="record-label">File</div>
+        <div class="record-value">${data.filename || '—'}</div>
+      </div>
+      <div class="record-row">
+        <div class="record-label">Author</div>
+        <div class="record-value">${data.author || '—'}</div>
+      </div>
+      ${data.orcid ? `<div class="record-row"><div class="record-label">ORCID</div><div class="record-value dim">${data.orcid}</div></div>` : ''}
+      ${data.org ? `<div class="record-row"><div class="record-label">Org</div><div class="record-value dim">${data.org}</div></div>` : ''}
+      <div class="record-row">
+        <div class="record-label">Registered</div>
+        <div class="record-value dim">${ts}</div>
+      </div>
+      ${data.tool ? `<div class="record-row"><div class="record-label">Tool</div><div class="record-value dim">${data.tool}</div></div>` : ''}
+    `;
+
+    document.getElementById('otsNote').style.display = 'block';
+    document.getElementById('result').classList.add('visible');
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function showNotFound(hash) {
+    const card = document.getElementById('resultCard');
+    card.className = 'result-card not-found';
+    document.getElementById('statusText').textContent = '✗ Not Found — Hash not in Registry';
+    document.getElementById('recordGrid').innerHTML = `
+      <div class="record-row">
+        <div class="record-label">Hash</div>
+        <div class="record-value hash">${hash}</div>
+      </div>
+      <div class="record-row">
+        <div class="record-label">Status</div>
+        <div class="record-value dim">This hash has not been registered in the Haawke Provenance Registry. It may have been certified through another system, or may not have been registered.</div>
+      </div>
+    `;
+    document.getElementById('otsNote').style.display = 'none';
+    document.getElementById('result').classList.add('visible');
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function showError(msg) {
+    const card = document.getElementById('resultCard');
+    card.className = 'result-card not-found';
+    document.getElementById('statusText').textContent = 'Error';
+    document.getElementById('recordGrid').innerHTML = `<div class="record-row"><div class="record-label">Message</div><div class="record-value dim">${msg}</div></div>`;
+    document.getElementById('otsNote').style.display = 'none';
+    document.getElementById('result').classList.add('visible');
+  }
+
+  async function loadRecent() {
+    try {
+      const res = await fetch(`${API}/recent`);
+      const data = await res.json();
+      const list = document.getElementById('recentList');
+      const count = document.getElementById('recentCount');
+
+      if (!data.records || data.records.length === 0) {
+        list.innerHTML = '<div class="empty-state">No registrations yet. Be the first — <a href="https://hash.haawke.com" style="color:var(--gold)">hash.haawke.com</a></div>';
+        return;
+      }
+
+      count.textContent = `${data.records.length} record${data.records.length !== 1 ? 's' : ''}`;
+
+      list.innerHTML = data.records.map(r => {
+        const ts = r.registered ? new Date(r.registered).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+        return `
+          <div class="recent-item" onclick="document.getElementById('hashInput').value='${r.hash}'; verifyHash();">
+            <div>
+              <div class="recent-filename">${r.filename || 'unnamed'}</div>
+              <div class="recent-hash">${r.hash}</div>
+            </div>
+            <div>
+              <div class="recent-time">${ts}</div>
+              <div class="recent-author">${r.author ? r.author.split('×')[0].trim() : ''}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+    } catch(e) {
+      document.getElementById('recentList').innerHTML = '<div class="empty-state">Could not load registry.</div>';
+    }
+  }
+</script>
+
+</body>
+</html>
