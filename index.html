@@ -15,7 +15,7 @@
     --blue: #4fa8e8;
     --blue-dim: rgba(79,168,232,0.15);
     --cream: #f0ead8;
-    --dim: rgba(240,234,216,0.55);
+    --dim: rgba(240,234,216,0.85);
     --verified: #4caf7d;
     --notfound: #e87b4f;
   }
@@ -79,7 +79,7 @@
   }
 
   .eyebrow {
-    font-size: 11px;
+    font-size: 15px;
     letter-spacing: 0.3em;
     text-transform: uppercase;
     color: var(--gold);
@@ -91,7 +91,7 @@
   h1 {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 300;
-    font-size: clamp(42px, 7vw, 72px);
+    font-size: 16px;
     line-height: 1;
     letter-spacing: -0.01em;
     color: var(--cream);
@@ -106,7 +106,7 @@
   }
 
   .tagline {
-    font-size: 13px;
+    font-size: 16px;
     letter-spacing: 0.1em;
     color: var(--dim);
     line-height: 1.8;
@@ -122,7 +122,7 @@
   }
 
   .search-label {
-    font-size: 11px;
+    font-size: 15px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--gold);
@@ -148,13 +148,13 @@
     border: none;
     color: var(--cream);
     font-family: 'Courier Prime', monospace;
-    font-size: 14px;
+    font-size: 17px;
     padding: 16px 20px;
     outline: none;
     letter-spacing: 0.06em;
   }
 
-  .search-input::placeholder { color: rgba(240,234,216,0.25); }
+  .search-input::placeholder { color: rgba(240,234,216,0.6); }
 
   .search-btn {
     background: transparent;
@@ -162,7 +162,7 @@
     border-left: 1px solid var(--border);
     color: var(--blue);
     font-family: 'Courier Prime', monospace;
-    font-size: 11px;
+    font-size: 15px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     padding: 16px 28px;
@@ -177,8 +177,8 @@
   }
 
   .search-hint {
-    font-size: 11px;
-    color: rgba(240,234,216,0.3);
+    font-size: 15px;
+    color: rgba(240,234,216,0.75);
     margin-top: 10px;
     letter-spacing: 0.06em;
   }
@@ -229,7 +229,7 @@
   .not-found .status-dot { background: var(--notfound); box-shadow: 0 0 12px var(--notfound); }
 
   .status-text {
-    font-size: 13px;
+    font-size: 16px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
   }
@@ -250,7 +250,7 @@
   }
 
   .record-label {
-    font-size: 10px;
+    font-size: 14px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--gold);
@@ -258,26 +258,26 @@
   }
 
   .record-value {
-    font-size: 14px;
+    font-size: 17px;
     color: var(--cream);
     line-height: 1.6;
     word-break: break-all;
   }
 
   .record-value.hash {
-    font-size: 12px;
+    font-size: 15px;
     color: var(--blue);
     letter-spacing: 0.04em;
   }
 
-  .record-value.dim { color: var(--dim); font-size: 13px; }
+  .record-value.dim { color: var(--dim); font-size: 16px; }
 
   .ots-note {
     margin-top: 24px;
     padding: 16px 20px;
     border: 1px solid rgba(201,168,76,0.2);
     background: rgba(201,168,76,0.04);
-    font-size: 12px;
+    font-size: 15px;
     color: var(--dim);
     line-height: 1.8;
     letter-spacing: 0.06em;
@@ -300,14 +300,14 @@
   }
 
   .section-label {
-    font-size: 11px;
+    font-size: 15px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--gold);
   }
 
   .section-count {
-    font-size: 11px;
+    font-size: 15px;
     color: var(--dim);
     letter-spacing: 0.1em;
   }
@@ -332,7 +332,7 @@
   }
 
   .recent-filename {
-    font-size: 14px;
+    font-size: 17px;
     color: var(--cream);
     margin-bottom: 3px;
     white-space: nowrap;
@@ -341,21 +341,21 @@
   }
 
   .recent-hash {
-    font-size: 10px;
+    font-size: 14px;
     color: var(--blue);
     letter-spacing: 0.04em;
-    opacity: 0.7;
+    opacity: 1;
   }
 
   .recent-time {
-    font-size: 11px;
+    font-size: 15px;
     color: var(--dim);
     white-space: nowrap;
     text-align: right;
   }
 
   .recent-author {
-    font-size: 10px;
+    font-size: 14px;
     color: rgba(201,168,76,0.6);
     text-align: right;
     margin-top: 2px;
@@ -365,7 +365,7 @@
     text-align: center;
     padding: 48px 24px;
     border: 1px dashed rgba(79,168,232,0.15);
-    font-size: 13px;
+    font-size: 16px;
     color: var(--dim);
     letter-spacing: 0.08em;
   }
@@ -376,8 +376,8 @@
     padding-top: 28px;
     border-top: 1px solid rgba(79,168,232,0.1);
     text-align: center;
-    font-size: 11px;
-    color: rgba(240,234,216,0.3);
+    font-size: 15px;
+    color: rgba(240,234,216,0.75);
     letter-spacing: 0.1em;
     line-height: 2.2;
   }
@@ -407,8 +407,8 @@
 
   @media (max-width: 600px) {
     .record-row { grid-template-columns: 1fr; gap: 4px; }
-    .record-label { font-size: 9px; }
-    .search-btn { padding: 16px 18px; font-size: 10px; }
+    .record-label { font-size: 14px; }
+    .search-btn { padding: 16px 18px; font-size: 14px; }
     .result-card { padding: 24px 20px; }
   }
 </style>
