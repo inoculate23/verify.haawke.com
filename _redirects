@@ -1,0 +1,3 @@
+/verify/:hash  https://haawke-verify.haawkeai.workers.dev/verify/:hash  301
+/#:hash  https://haawke-verify.haawkeai.workers.dev/verify/:hash  301
+/  https://hash.haawke.com  301
