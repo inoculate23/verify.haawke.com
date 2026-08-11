@@ -533,6 +533,7 @@
     document.getElementById('statusText').textContent = '✓ Verified — Found in Registry';
 
     const ts = data.registered ? new Date(data.registered).toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' }) : '—';
+    const sessionTypeLabel = data.session_type === 'autonomous' ? 'Autonomous daemon seal' : 'Human-initiated';
 
     document.getElementById('recordGrid').innerHTML = `
       <div class="record-row">
@@ -546,6 +547,10 @@
       <div class="record-row">
         <div class="record-label">Author</div>
         <div class="record-value">${data.author || '—'}</div>
+      </div>
+      <div class="record-row">
+        <div class="record-label">Session Type</div>
+        <div class="record-value dim">${sessionTypeLabel}</div>
       </div>
       ${data.orcid ? `<div class="record-row"><div class="record-label">ORCID</div><div class="record-value dim">${data.orcid}</div></div>` : ''}
       ${data.org ? `<div class="record-row"><div class="record-label">Org</div><div class="record-value dim">${data.org}</div></div>` : ''}
