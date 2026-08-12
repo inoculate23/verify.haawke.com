@@ -454,6 +454,10 @@
           <div class="status-dot"></div>
           <div class="status-text" id="statusText"></div>
         </div>
+        <div id="thumbnailBox" style="display:none; margin-bottom:24px; text-align:center;">
+          <img id="thumbnailImg" alt="Registered content preview" style="max-width:160px; max-height:160px; border:1px solid var(--border); display:inline-block;">
+          <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--dim); margin-top:8px;">Registered content preview</div>
+        </div>
         <div class="record-grid" id="recordGrid"></div>
         <div class="ots-note" id="otsNote" style="display:none">
           <strong style="color:var(--gold)">Blockchain Verification</strong><br>
@@ -527,10 +531,26 @@
     btn.disabled = false;
   }
 
+  // Shared across all result states so a stale thumbnail from a previous
+  // lookup never lingers — no placeholder/broken-image, just hidden.
+  function updateThumbnail(data) {
+    const box = document.getElementById('thumbnailBox');
+    const img = document.getElementById('thumbnailImg');
+    if (data && data.thumbnail_base64) {
+      const mediaType = (data.content && data.content.media_type) || 'image/png';
+      img.src = `data:${mediaType};base64,${data.thumbnail_base64}`;
+      box.style.display = 'block';
+    } else {
+      img.src = '';
+      box.style.display = 'none';
+    }
+  }
+
   async function showVerified(data) {
     const card = document.getElementById('resultCard');
     card.className = 'result-card verified';
     document.getElementById('statusText').textContent = '✓ Verified — Found in Registry';
+    updateThumbnail(data);
 
     if (data.schema_version === '2.0') {
       await showVerifiedV2(data);
@@ -632,6 +652,7 @@
         <div class="record-label">Bitcoin</div>
         <div class="record-value dim">${bitcoinLabel}</div>
       </div>
+      ${data.xmp_url ? `<div class="record-row"><div class="record-label">XMP</div><div class="record-value"><a href="${data.xmp_url}" target="_blank" style="color:var(--blue)">download sidecar →</a></div></div>` : ''}
     `;
   }
 
@@ -675,6 +696,7 @@
     const card = document.getElementById('resultCard');
     card.className = 'result-card not-found';
     document.getElementById('statusText').textContent = '✗ Not Found — Hash not in Registry';
+    updateThumbnail(null);
     document.getElementById('recordGrid').innerHTML = `
       <div class="record-row">
         <div class="record-label">Hash</div>
@@ -694,6 +716,7 @@
     const card = document.getElementById('resultCard');
     card.className = 'result-card not-found';
     document.getElementById('statusText').textContent = 'Error';
+    updateThumbnail(null);
     document.getElementById('recordGrid').innerHTML = `<div class="record-row"><div class="record-label">Message</div><div class="record-value dim">${msg}</div></div>`;
     document.getElementById('otsNote').style.display = 'none';
     document.getElementById('result').classList.add('visible');
