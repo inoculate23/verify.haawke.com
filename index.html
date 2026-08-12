@@ -564,9 +564,11 @@
       chainLabel = 'unavailable';
     }
 
-    const sealLabel = data.record_hash_valid
-      ? '✓ record hash valid'
-      : '⚠ MISMATCH — record may have been altered since sealing';
+    const sealLabel = data.certificate_valid
+      ? '✓ Ed25519 signature valid'
+      : (data.certificate_hash_valid
+          ? '⚠ hash valid but signature check failed'
+          : '⚠ MISMATCH — record may have been altered since sealing');
 
     const bitcoinLabel = data.anchor?.ots_status === 'confirmed'
       ? `✓ confirmed — block #${data.anchor.bitcoin_block}`
@@ -619,8 +621,8 @@
         <div class="record-value dim">${chainLabel}</div>
       </div>
       <div class="record-row">
-        <div class="record-label">Self-seal</div>
-        <div class="record-value dim">${sealLabel}</div>
+        <div class="record-label">Signature</div>
+        <div class="record-value dim">${sealLabel}${data.verification?.signing_key_url ? ` — <a href="${data.verification.signing_key_url}" target="_blank" style="color:var(--blue)">public key</a>` : ''}</div>
       </div>
       <div class="record-row">
         <div class="record-label">Registered</div>
