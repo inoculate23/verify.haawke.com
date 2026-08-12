@@ -454,6 +454,10 @@
           <div class="status-dot"></div>
           <div class="status-text" id="statusText"></div>
         </div>
+        <div id="thumbnailBox" style="display:none; margin-bottom:24px; text-align:center;">
+          <img id="thumbnailImg" alt="Registered content preview" style="max-width:160px; max-height:160px; border:1px solid var(--border); display:inline-block;">
+          <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--dim); margin-top:8px;">Registered content preview</div>
+        </div>
         <div class="record-grid" id="recordGrid"></div>
         <div class="ots-note" id="otsNote" style="display:none">
           <strong style="color:var(--gold)">Blockchain Verification</strong><br>
@@ -515,7 +519,7 @@
       const res = await fetch(`${API}/verify/${hash}`);
       const data = await res.json();
       if (data.status === 'verified') {
-        showVerified(data);
+        await showVerified(data);
       } else {
         showNotFound(hash);
       }
@@ -527,11 +531,133 @@
     btn.disabled = false;
   }
 
-  function showVerified(data) {
+  // Shared across all result states so a stale thumbnail from a previous
+  // lookup never lingers — no placeholder/broken-image, just hidden.
+  function updateThumbnail(data) {
+    const box = document.getElementById('thumbnailBox');
+    const img = document.getElementById('thumbnailImg');
+    if (data && data.thumbnail_base64) {
+      const mediaType = (data.content && data.content.media_type) || 'image/png';
+      img.src = `data:${mediaType};base64,${data.thumbnail_base64}`;
+      box.style.display = 'block';
+    } else {
+      img.src = '';
+      box.style.display = 'none';
+    }
+  }
+
+  async function showVerified(data) {
     const card = document.getElementById('resultCard');
     card.className = 'result-card verified';
     document.getElementById('statusText').textContent = '✓ Verified — Found in Registry';
+    updateThumbnail(data);
 
+    if (data.schema_version === '2.0') {
+      await showVerifiedV2(data);
+    } else {
+      showVerifiedLegacy(data);
+    }
+
+    document.getElementById('otsNote').style.display = 'block';
+    document.getElementById('result').classList.add('visible');
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Schema v2.0 — nested record (content/identity/anthropic/chain/timestamp/anchor/verification).
+  async function showVerifiedV2(data) {
+    const ts = data.timestamp?.registered_at
+      ? new Date(data.timestamp.registered_at).toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' })
+      : '—';
+    const sessionTypeLabel = data.identity?.session_type === 'autonomous' ? 'Autonomous daemon seal' : 'Human-initiated';
+
+    const seq = data.chain?.sequence_number;
+    const seqLabel = seq ? `#${String(seq).padStart(5, '0')}` : '—';
+
+    let chainLabel = 'checking…';
+    try {
+      const chainResp = await fetch(`${API}/chain`);
+      const chainData = await chainResp.json();
+      chainLabel = chainData.chain_unbroken
+        ? '✓ unbroken (registry-wide)'
+        : `⚠ ${chainData.gaps.length} gap(s) detected (registry-wide)`;
+    } catch {
+      chainLabel = 'unavailable';
+    }
+
+    const sealLabel = data.certificate_valid
+      ? '✓ Ed25519 signature valid'
+      : (data.certificate_hash_valid
+          ? '⚠ hash valid but signature check failed'
+          : '⚠ MISMATCH — record may have been altered since sealing');
+
+    const bitcoinLabel = data.anchor?.ots_status === 'confirmed'
+      ? `✓ confirmed — block #${data.anchor.bitcoin_block}`
+      : `pending${data.ots_pending_hours != null ? ` (${data.ots_pending_hours}h)` : ''}`;
+
+    const sessionIdLabel = data.anthropic?.session_id
+      ? `${data.anthropic.session_id} <span class="record-value dim">(${data.anthropic.session_id_source})</span>`
+      : 'not exposed by this session';
+
+    const modelLabel = data.anthropic?.model
+      ? (data.verification?.model_card_url
+          ? `<a href="${data.verification.model_card_url}" target="_blank" style="color:var(--blue)">${data.anthropic.model}</a>`
+          : data.anthropic.model)
+      : '—';
+
+    document.getElementById('recordGrid').innerHTML = `
+      <div class="record-row">
+        <div class="record-label">Output</div>
+        <div class="record-value hash">${data.content.output_hash}</div>
+      </div>
+      ${data.content.input_hash ? `<div class="record-row"><div class="record-label">Input</div><div class="record-value hash">${data.content.input_hash}</div></div>` : ''}
+      <div class="record-row">
+        <div class="record-label">File</div>
+        <div class="record-value">${data.content.filename || '—'}</div>
+      </div>
+      <div class="record-row">
+        <div class="record-label">Author</div>
+        <div class="record-value">${data.identity.author || '—'}</div>
+      </div>
+      <div class="record-row">
+        <div class="record-label">Session Type</div>
+        <div class="record-value dim">${sessionTypeLabel}</div>
+      </div>
+      ${data.identity.orcid ? `<div class="record-row"><div class="record-label">ORCID</div><div class="record-value dim">${data.identity.orcid}</div></div>` : ''}
+      ${data.identity.org ? `<div class="record-row"><div class="record-label">Org</div><div class="record-value dim">${data.identity.org}</div></div>` : ''}
+      <div class="record-row">
+        <div class="record-label">Model</div>
+        <div class="record-value">${modelLabel}</div>
+      </div>
+      <div class="record-row">
+        <div class="record-label">Session</div>
+        <div class="record-value">${sessionIdLabel}</div>
+      </div>
+      <div class="record-row">
+        <div class="record-label">Sequence</div>
+        <div class="record-value">${seqLabel}</div>
+      </div>
+      <div class="record-row">
+        <div class="record-label">Chain</div>
+        <div class="record-value dim">${chainLabel}</div>
+      </div>
+      <div class="record-row">
+        <div class="record-label">Signature</div>
+        <div class="record-value dim">${sealLabel}${data.verification?.signing_key_url ? ` — <a href="${data.verification.signing_key_url}" target="_blank" style="color:var(--blue)">public key</a>` : ''}</div>
+      </div>
+      <div class="record-row">
+        <div class="record-label">Registered</div>
+        <div class="record-value dim">${ts}</div>
+      </div>
+      <div class="record-row">
+        <div class="record-label">Bitcoin</div>
+        <div class="record-value dim">${bitcoinLabel}</div>
+      </div>
+      ${data.xmp_url ? `<div class="record-row"><div class="record-label">XMP</div><div class="record-value"><a href="${data.xmp_url}" target="_blank" style="color:var(--blue)">download sidecar →</a></div></div>` : ''}
+    `;
+  }
+
+  // Pre-v2 flat records — still resolvable by hash on the same registry.
+  function showVerifiedLegacy(data) {
     const ts = data.registered_at ? new Date(data.registered_at).toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' }) : '—';
     const sessionTypeLabel = data.session_type === 'autonomous' ? 'Autonomous daemon seal' : 'Human-initiated';
 
@@ -559,17 +685,18 @@
         <div class="record-value dim">${ts}</div>
       </div>
       ${data.tool ? `<div class="record-row"><div class="record-label">Tool</div><div class="record-value dim">${data.tool}</div></div>` : ''}
+      <div class="record-row">
+        <div class="record-label">Schema</div>
+        <div class="record-value dim">pre-2.0 record — chain/model/session fields not available</div>
+      </div>
     `;
-
-    document.getElementById('otsNote').style.display = 'block';
-    document.getElementById('result').classList.add('visible');
-    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function showNotFound(hash) {
     const card = document.getElementById('resultCard');
     card.className = 'result-card not-found';
     document.getElementById('statusText').textContent = '✗ Not Found — Hash not in Registry';
+    updateThumbnail(null);
     document.getElementById('recordGrid').innerHTML = `
       <div class="record-row">
         <div class="record-label">Hash</div>
@@ -589,6 +716,7 @@
     const card = document.getElementById('resultCard');
     card.className = 'result-card not-found';
     document.getElementById('statusText').textContent = 'Error';
+    updateThumbnail(null);
     document.getElementById('recordGrid').innerHTML = `<div class="record-row"><div class="record-label">Message</div><div class="record-value dim">${msg}</div></div>`;
     document.getElementById('otsNote').style.display = 'none';
     document.getElementById('result').classList.add('visible');
