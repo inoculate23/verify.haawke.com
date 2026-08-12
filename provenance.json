@@ -1,10 +1,10 @@
 {
-  "hash": "c6da2fcf2c1d0092743c0a38f7af735de7d97703a728793bbb79ee4ef536a156",
+  "hash": "82c9eb6c945578e3bd1bd1c9e6dd3df4b1ba29a6beeb352af3ecc54b999f3845",
   "date": "August 11, 2026",
   "author": "Claude Code (Independent)",
   "orcid": null,
   "org": "Haawke Neural Technology",
-  "tool": "Haawke Hash v1.3",
+  "tool": "Haawke Hash v2.1",
   "blockchain": "Bitcoin via OpenTimestamps",
   "verify": "https://opentimestamps.org/verify"
 }
