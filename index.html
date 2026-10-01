@@ -505,7 +505,6 @@
 
   async function verifyHash() {
     const hash = document.getElementById('hashInput').value.trim().toLowerCase();
-    if (!hash) return;
     if (hash.length !== 64 || !/^[0-9a-f]+$/.test(hash)) {
       showError('Invalid hash format. SHA-256 hashes are 64 hexadecimal characters.');
       return;
@@ -519,7 +518,8 @@
       const res = await fetch(`${API}/verify/${hash}`);
       const data = await res.json();
       if (data.status === 'verified') {
-        await showVerified(data);
+        if (!res.ok) throw new Error('Unsuccessful registry response');
+        await showVerified(data, hash);
       } else {
         showNotFound(hash);
       }
@@ -546,7 +546,33 @@
     }
   }
 
-  async function showVerified(data) {
+  // Lookup identity is presentation context, never a backfilled registry field.
+  function resolveLookupRecord(record, lookupDigest) {
+    const normalizedLookupDigest = typeof lookupDigest === 'string' ? lookupDigest.trim().toLowerCase() : '';
+    if (!/^[0-9a-f]{64}$/.test(normalizedLookupDigest)) {
+      throw new Error('Integrity error: invalid lookup digest.');
+    }
+    const storedRecordHashes = [];
+    if (Object.hasOwn(record, 'hash')) storedRecordHashes.push({ field: 'hash', value: record.hash });
+    if (record.schema_version === '2.0' || Object.hasOwn(record.content || {}, 'output_hash')) {
+      storedRecordHashes.push({ field: 'content.output_hash', value: record.content?.output_hash });
+    }
+    for (const stored of storedRecordHashes) {
+      if (typeof stored.value !== 'string' || !/^[0-9a-f]{64}$/i.test(stored.value) || stored.value.toLowerCase() !== normalizedLookupDigest) {
+        throw new Error('Integrity error: stored record hash is invalid or disagrees with the lookup digest.');
+      }
+    }
+    return { record, lookupDigest: normalizedLookupDigest, storedRecordHashes, displayDigest: normalizedLookupDigest };
+  }
+
+  async function showVerified(data, lookupDigest) {
+    let lookup;
+    try {
+      lookup = resolveLookupRecord(data, lookupDigest);
+    } catch (error) {
+      showError(error.message);
+      return;
+    }
     const card = document.getElementById('resultCard');
     card.className = 'result-card verified';
     document.getElementById('statusText').textContent = '✓ Verified — Found in Registry';
@@ -555,7 +581,7 @@
     if (data.schema_version === '2.0') {
       await showVerifiedV2(data);
     } else {
-      showVerifiedLegacy(data);
+      showVerifiedLegacy(lookup);
     }
 
     document.getElementById('otsNote').style.display = 'block';
@@ -657,14 +683,14 @@
   }
 
   // Pre-v2 flat records — still resolvable by hash on the same registry.
-  function showVerifiedLegacy(data) {
+  function showVerifiedLegacy({ record: data, displayDigest }) {
     const ts = data.registered_at ? new Date(data.registered_at).toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' }) : '—';
     const sessionTypeLabel = data.session_type === 'autonomous' ? 'Autonomous daemon seal' : 'Human-initiated';
 
     document.getElementById('recordGrid').innerHTML = `
       <div class="record-row">
         <div class="record-label">Hash</div>
-        <div class="record-value hash">${data.hash}</div>
+        <div class="record-value hash">${displayDigest}</div>
       </div>
       <div class="record-row">
         <div class="record-label">File</div>

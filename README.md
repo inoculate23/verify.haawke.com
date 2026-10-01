@@ -106,3 +106,10 @@ See [LICENSE](LICENSE)
 
 *Craig Ellenwood × Claude (Anthropic) · Haawke Neural Technology · 2026*  
 *ORCID: 0009-0001-6475-5109 · haawke.com*
+
+
+## Renderer regression tests
+
+Run `node --test tests/renderer.test.mjs` from this repository. Tests execute the actual inline lookup/renderer code with a local DOM stub and mocked registry responses; no network requests or registry writes occur.
+
+Legacy records without a stored canonical hash display the normalized successful lookup digest. Lookup context and stored record fields remain separate; no historical fields are backfilled. Any present canonical hash (including current `content.output_hash`) must be valid and agree with the lookup before the renderer reports Verified. Current records require their output hash.
