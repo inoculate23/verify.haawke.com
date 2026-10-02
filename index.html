@@ -589,12 +589,14 @@
     document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  const escapeRecordValue = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
+
   // Schema v2.0 — nested record (content/identity/anthropic/chain/timestamp/anchor/verification).
   async function showVerifiedV2(data) {
     const ts = data.timestamp?.registered_at
       ? new Date(data.timestamp.registered_at).toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' })
       : '—';
-    const sessionTypeLabel = data.identity?.session_type === 'autonomous' ? 'Autonomous daemon seal' : 'Human-initiated';
+    const sessionTypeLabel = data.identity?.session_type === 'autonomous' ? 'Autonomous daemon seal' : data.identity?.session_type === 'human-initiated' ? 'Human-initiated' : 'Not specified by registrant';
 
     const seq = data.chain?.sequence_number;
     const seqLabel = seq ? `#${String(seq).padStart(5, '0')}` : '—';
@@ -621,35 +623,35 @@
       : `pending${data.ots_pending_hours != null ? ` (${data.ots_pending_hours}h)` : ''}`;
 
     const sessionIdLabel = data.anthropic?.session_id
-      ? `${data.anthropic.session_id} <span class="record-value dim">(${data.anthropic.session_id_source})</span>`
+      ? `${escapeRecordValue(data.anthropic.session_id)} <span class="record-value dim">(${escapeRecordValue(data.anthropic.session_id_source)})</span>`
       : 'not exposed by this session';
 
     const modelLabel = data.anthropic?.model
       ? (data.verification?.model_card_url
-          ? `<a href="${data.verification.model_card_url}" target="_blank" style="color:var(--blue)">${data.anthropic.model}</a>`
-          : data.anthropic.model)
+          ? `<a href="${escapeRecordValue(data.verification.model_card_url)}" target="_blank" style="color:var(--blue)">${escapeRecordValue(data.anthropic.model)}</a>`
+          : escapeRecordValue(data.anthropic.model))
       : '—';
 
     document.getElementById('recordGrid').innerHTML = `
       <div class="record-row">
         <div class="record-label">Output</div>
-        <div class="record-value hash">${data.content.output_hash}</div>
+        <div class="record-value hash">${escapeRecordValue(data.content.output_hash)}</div>
       </div>
-      ${data.content.input_hash ? `<div class="record-row"><div class="record-label">Input</div><div class="record-value hash">${data.content.input_hash}</div></div>` : ''}
+      ${data.content.input_hash ? `<div class="record-row"><div class="record-label">Input</div><div class="record-value hash">${escapeRecordValue(data.content.input_hash)}</div></div>` : ''}
       <div class="record-row">
         <div class="record-label">File</div>
-        <div class="record-value">${data.content.filename || '—'}</div>
+        <div class="record-value">${escapeRecordValue(data.content.filename || '—')}</div>
       </div>
       <div class="record-row">
         <div class="record-label">Author</div>
-        <div class="record-value">${data.identity.author || '—'}</div>
+        <div class="record-value">${escapeRecordValue(data.identity.author || '—')}</div>
       </div>
       <div class="record-row">
         <div class="record-label">Session Type</div>
         <div class="record-value dim">${sessionTypeLabel}</div>
       </div>
-      ${data.identity.orcid ? `<div class="record-row"><div class="record-label">ORCID</div><div class="record-value dim">${data.identity.orcid}</div></div>` : ''}
-      ${data.identity.org ? `<div class="record-row"><div class="record-label">Org</div><div class="record-value dim">${data.identity.org}</div></div>` : ''}
+      ${data.identity.orcid ? `<div class="record-row"><div class="record-label">ORCID</div><div class="record-value dim">${escapeRecordValue(data.identity.orcid)}</div></div>` : ''}
+      ${data.identity.org ? `<div class="record-row"><div class="record-label">Org</div><div class="record-value dim">${escapeRecordValue(data.identity.org)}</div></div>` : ''}
       <div class="record-row">
         <div class="record-label">Model</div>
         <div class="record-value">${modelLabel}</div>
@@ -668,7 +670,7 @@
       </div>
       <div class="record-row">
         <div class="record-label">Signature</div>
-        <div class="record-value dim">${sealLabel}${data.verification?.signing_key_url ? ` — <a href="${data.verification.signing_key_url}" target="_blank" style="color:var(--blue)">public key</a>` : ''}</div>
+        <div class="record-value dim">${sealLabel}${data.verification?.signing_key_url ? ` — <a href="${escapeRecordValue(data.verification.signing_key_url)}" target="_blank" style="color:var(--blue)">public key</a>` : ''}</div>
       </div>
       <div class="record-row">
         <div class="record-label">Registered</div>
@@ -678,7 +680,7 @@
         <div class="record-label">Bitcoin</div>
         <div class="record-value dim">${bitcoinLabel}</div>
       </div>
-      ${data.xmp_url ? `<div class="record-row"><div class="record-label">XMP</div><div class="record-value"><a href="${data.xmp_url}" target="_blank" style="color:var(--blue)">download sidecar →</a></div></div>` : ''}
+      ${data.xmp_url ? `<div class="record-row"><div class="record-label">XMP</div><div class="record-value"><a href="${escapeRecordValue(data.xmp_url)}" target="_blank" style="color:var(--blue)">download sidecar →</a></div></div>` : ''}
     `;
   }
 
