@@ -69,3 +69,10 @@ test('current-schema public labels are escaped and unspecified session type does
  const record=freeze({status:'verified',schema_version:'2.0',content:{output_hash:digest,filename:'<img src=x onerror=alert(1)>'},identity:{author:'<script>unsafe</script>',session_type:'api'},anthropic:{model:'<img onerror=alert(1)>'},certificate_valid:true});const h=harness(record);await(await h.ready).verifyHash();const html=h.element('recordGrid').innerHTML;assert.ok(!html.includes('<img'));assert.ok(!html.includes('<script>'));assert.ok(html.includes('&lt;img'));assert.ok(html.includes('Not specified by registrant'));
  const legacy=freeze({status:'verified',hash:digest,author:'Legacy'});const old=harness(legacy);await(await old.ready).verifyHash();assert.ok(old.element('recordGrid').innerHTML.includes('pre-2.0 record — chain/model/session fields not available'));
 });
+
+test('optional creator fields render independently from service with clickable escaped ORCID',async()=>{
+ for(const creator of [{name:'Creator <script>'},{organization:'Org & Co'},{orcid:'0009-0001-6475-5109'},{name:'Craig Ellenwood',organization:'Haawke Neural Technology, LLC',orcid:'0009-0001-6475-5109'},undefined]){
+ const record=freeze({status:'verified',schema_version:'2.0',content:{output_hash:digest},identity:{author:'Haawke artifact service',service:'Haawke Phoenix chat service',...(creator?{creator}:{})},anthropic:{model:'Actual model'},certificate_valid:true});const before=JSON.stringify(record),h=harness(record);await(await h.ready).verifyHash();const rendered=h.element('recordGrid').innerHTML;
+ assert.ok(rendered.includes('Haawke Phoenix chat service'));assert.ok(rendered.includes('Actual model'));assert.equal(rendered.includes('record-label">Creator'),Boolean(creator?.name));assert.equal(rendered.includes('record-label">Organization'),Boolean(creator?.organization));assert.equal(rendered.includes('https://orcid.org/0009-0001-6475-5109'),Boolean(creator?.orcid));assert.ok(!rendered.includes('<script>'));assert.equal(JSON.stringify(record),before);
+ }
+});

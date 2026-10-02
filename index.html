@@ -643,15 +643,18 @@
         <div class="record-value">${escapeRecordValue(data.content.filename || '—')}</div>
       </div>
       <div class="record-row">
-        <div class="record-label">Author</div>
-        <div class="record-value">${escapeRecordValue(data.identity.author || '—')}</div>
+        <div class="record-label">${data.identity.service?'Service':'Author'}</div>
+        <div class="record-value">${escapeRecordValue(data.identity.service || data.identity.author || '—')}</div>
       </div>
       <div class="record-row">
         <div class="record-label">Session Type</div>
         <div class="record-value dim">${sessionTypeLabel}</div>
       </div>
+      ${data.identity.creator?.name ? `<div class="record-row"><div class="record-label">Creator</div><div class="record-value">${escapeRecordValue(data.identity.creator.name)}</div></div>` : ''}
+      ${data.identity.creator?.organization ? `<div class="record-row"><div class="record-label">Organization</div><div class="record-value">${escapeRecordValue(data.identity.creator.organization)}</div></div>` : ''}
+      ${data.identity.creator?.orcid && /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/.test(data.identity.creator.orcid) ? `<div class="record-row"><div class="record-label">ORCID</div><div class="record-value"><a href="https://orcid.org/${escapeRecordValue(data.identity.creator.orcid)}" target="_blank" rel="noopener noreferrer">${escapeRecordValue(data.identity.creator.orcid)}</a></div></div>` : ''}
       ${data.identity.orcid ? `<div class="record-row"><div class="record-label">ORCID</div><div class="record-value dim">${escapeRecordValue(data.identity.orcid)}</div></div>` : ''}
-      ${data.identity.org ? `<div class="record-row"><div class="record-label">Org</div><div class="record-value dim">${escapeRecordValue(data.identity.org)}</div></div>` : ''}
+      ${!data.identity.service && data.identity.org ? `<div class="record-row"><div class="record-label">Org</div><div class="record-value dim">${escapeRecordValue(data.identity.org)}</div></div>` : ''}
       <div class="record-row">
         <div class="record-label">Model</div>
         <div class="record-value">${modelLabel}</div>
