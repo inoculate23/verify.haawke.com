@@ -1,10 +1,9 @@
 {
-  "hash": "82c9eb6c945578e3bd1bd1c9e6dd3df4b1ba29a6beeb352af3ecc54b999f3845",
-  "date": "August 11, 2026",
-  "author": "Claude Code (Independent)",
-  "orcid": null,
-  "org": "Haawke Neural Technology",
-  "tool": "Haawke Hash v2.1",
-  "blockchain": "Bitcoin via OpenTimestamps",
-  "verify": "https://opentimestamps.org/verify"
+  "sha256": "82c9eb6c945578e3bd1bd1c9e6dd3df4b1ba29a6beeb352af3ecc54b999f3845",
+  "source": "index.html",
+  "authored": "2026-11-11T05:17:45.787Z",
+  "author": "Craig Ellenwood",
+  "org": "Squaawke / Haawke Neural",
+  "orcid": "0009-0001-6475-5109",
+  "tool": "Haawke Hash — Provenance Tool"
 }
